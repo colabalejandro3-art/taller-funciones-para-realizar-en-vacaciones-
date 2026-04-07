@@ -1,0 +1,232 @@
+# TALLER: FUNCIONES CON LISTAS, TUPLAS Y DICCIONARIOS
+
+# 1. Promedio, nota más alta y más baja de una lista de notas
+def estadisticas_notas(notas):
+    """
+    Recibe una lista de notas y retorna una tupla (promedio, max, min)
+    """
+    if not notas:
+        return (0, 0, 0)
+    promedio = sum(notas) / len(notas)
+    max_nota = max(notas)
+    min_nota = min(notas)
+    return (promedio, max_nota, min_nota)
+
+# 2. Estudiantes aprobados (nota >= 3.0) a partir de una lista de tuplas (nombre, nota)
+def aprobados(estudiantes):
+    """
+    Filtra los estudiantes con nota >= 3.0 y retorna una lista de tuplas (nombre, nota)
+    """
+    return [(nombre, nota) for nombre, nota in estudiantes if nota >= 3.0]
+
+# 3. Agenda simple: agregar, buscar y eliminar contactos (diccionario)
+agenda = {}  # diccionario global para almacenar contactos
+
+def agregar_contacto(nombre, telefono):
+    agenda[nombre] = telefono
+
+def buscar_contacto(nombre):
+    return agenda.get(nombre, "Contacto no encontrado")
+
+def eliminar_contacto(nombre):
+    if nombre in agenda:
+        del agenda[nombre]
+        return True
+    return False
+
+# 4. Inventario: cada producto con nombre, precio y cantidad. Calcular valor total.
+def valor_total_inventario(inventario):
+    """
+    inventario: lista de diccionarios con claves 'nombre', 'precio', 'cantidad'
+    Retorna el valor total (suma de precio * cantidad)
+    """
+    total = 0
+    for producto in inventario:
+        total += producto['precio'] * producto['cantidad']
+    return total
+
+# 5. Frecuencia de palabras en una lista
+def frecuencia_palabras(lista_palabras):
+    """
+    Construye un diccionario con la frecuencia de cada palabra
+    """
+    freq = {}
+    for palabra in lista_palabras:
+        freq[palabra] = freq.get(palabra, 0) + 1
+    return freq
+
+# 6. Temperaturas semanales por ciudad: encontrar la más caliente y la más fría de la semana
+def temperaturas_extremas(temp_ciudades):
+    """
+    temp_ciudades: diccionario {ciudad: [lista de 7 temperaturas]}
+    Retorna una tupla (ciudad_mas_caliente, temp_max, ciudad_mas_fria, temp_min)
+    """
+    todas_temp = []
+    for ciudad, temps in temp_ciudades.items():
+        for t in temps:
+            todas_temp.append((ciudad, t))
+    if not todas_temp:
+        return (None, None, None, None)
+    max_temp = max(todas_temp, key=lambda x: x[1])
+    min_temp = min(todas_temp, key=lambda x: x[1])
+    return (max_temp[0], max_temp[1], min_temp[0], min_temp[1])
+
+# 7. Convertir notas numéricas a letras usando tuplas como rangos
+# Rangos definidos como una lista de tuplas (limite_inferior, limite_superior, letra)
+rangos_notas = [
+    (90, 100, 'A'),
+    (80, 89, 'B'),
+    (70, 79, 'C'),
+    (60, 69, 'D'),
+    (0, 59, 'F')
+]
+
+def nota_a_letra(nota):
+    for inf, sup, letra in rangos_notas:
+        if inf <= nota <= sup:
+            return letra
+    return 'F'  # por si acaso
+
+def reporte_estudiantes(estudiantes):
+    """
+    estudiantes: lista de tuplas (nombre, nota)
+    Retorna una lista de tuplas (nombre, letra)
+    """
+    return [(nombre, nota_a_letra(nota)) for nombre, nota in estudiantes]
+
+# 8. Carrito de compras: agregar productos, aplicar descuentos, total a pagar
+carrito = []  # lista de diccionarios {'producto': str, 'precio': float, 'cantidad': int}
+
+def agregar_producto(producto, precio, cantidad=1):
+    carrito.append({'producto': producto, 'precio': precio, 'cantidad': cantidad})
+
+def aplicar_descuento(porcentaje):
+    """
+    Aplica un descuento porcentual al total del carrito y retorna el total con descuento.
+    No modifica el carrito.
+    """
+    total = sum(item['precio'] * item['cantidad'] for item in carrito)
+    descuento = total * (porcentaje / 100)
+    return total - descuento
+
+def total_carrito():
+    return sum(item['precio'] * item['cantidad'] for item in carrito)
+
+# 9. Agrupar productos por categoría a partir de una lista de tuplas (producto, categoría)
+def agrupar_por_categoria(productos):
+    """
+    productos: lista de tuplas (producto, categoria)
+    Retorna un diccionario {categoria: [lista de productos]}
+    """
+    grupos = {}
+    for prod, cat in productos:
+        grupos.setdefault(cat, []).append(prod)
+    return grupos
+
+# 10. Registro de votos: detectar inválidos, determinar ganador y su porcentaje
+def procesar_votos(votos, candidatos_validos):
+    """
+    votos: lista de strings (nombre del candidato votado)
+    candidatos_validos: conjunto o lista de nombres válidos
+    Retorna un diccionario con el resumen y el ganador.
+    """
+    conteo = {}
+    invalidos = 0
+    for voto in votos:
+        if voto in candidatos_validos:
+            conteo[voto] = conteo.get(voto, 0) + 1
+        else:
+            invalidos += 1
+    total_validos = sum(conteo.values())
+    if total_validos == 0:
+        return None  # No hay votos válidos
+    # Encontrar ganador
+    ganador = max(conteo.items(), key=lambda x: x[1])
+    porcentaje = (ganador[1] / total_validos) * 100
+    return {
+        'conteo': conteo,
+        'votos_invalidos': invalidos,
+        'ganador': ganador[0],
+        'porcentaje_ganador': porcentaje
+    }
+
+# EJEMPLOS DE USO (DEMOSTRACIÓN)
+if __name__ == "__main__":
+    print(" Punto 1: Estadísticas de notas ")
+    notas = [4.5, 3.2, 5.0, 2.8, 3.9]
+    prom, maxn, minn = estadisticas_notas(notas)
+    print(f"Notas: {notas}")
+    print(f"Promedio: {prom:.2f}, Máxima: {maxn}, Mínima: {minn}\n")
+
+    print("Punto 2: Estudiantes aprobados")
+    estudiantes = [("Ana", 4.2), ("Luis", 2.5), ("Marta", 3.0), ("Juan", 1.8)]
+    aprob = aprobados(estudiantes)
+    print(f"Original: {estudiantes}")
+    print(f"Aprobados: {aprob}\n")
+
+    print("Punto 3: Agenda ")
+    agregar_contacto("Carlos", "12345678")
+    agregar_contacto("Lucía", "87654321")
+    print("Buscar Carlos:", buscar_contacto("Carlos"))
+    eliminar_contacto("Carlos")
+    print("Buscar Carlos después de eliminar:", buscar_contacto("Carlos"))
+    print("Agenda actual:", agenda, "\n")
+
+    print("Punto 4: Inventario ")
+    inventario = [
+        {'nombre': 'Lápiz', 'precio': 0.5, 'cantidad': 100},
+        {'nombre': 'Cuaderno', 'precio': 2.0, 'cantidad': 50},
+        {'nombre': 'Borrador', 'precio': 0.8, 'cantidad': 200}
+    ]
+    total_valor = valor_total_inventario(inventario)
+    print(f"Inventario: {inventario}")
+    print(f"Valor total del inventario: ${total_valor:.2f}\n")
+
+    print("Punto 5: Frecuencia de palabras")
+    palabras = ["hola", "mundo", "hola", "python", "mundo", "hola"]
+    freq = frecuencia_palabras(palabras)
+    print(f"Lista: {palabras}")
+    print(f"Frecuencias: {freq}\n")
+
+    print("Punto 6: Temperaturas extremas")
+    temps = {
+        'Bogotá': [15, 16, 14, 13, 15, 17, 18],
+        'Medellín': [22, 23, 21, 24, 25, 22, 23],
+        'Cali': [28, 29, 30, 27, 31, 29, 30]
+    }
+    ciudad_max, temp_max, ciudad_min, temp_min = temperaturas_extremas(temps)
+    print(f"Temperaturas por ciudad: {temps}")
+    print(f"Más caliente: {ciudad_max} con {temp_max}°C")
+    print(f"Más fría: {ciudad_min} con {temp_min}°C\n")
+
+    print("Punto 7: Conversión de notas a letras")
+    estudiantes_notas = [("Ana", 95), ("Luis", 72), ("Marta", 58), ("Juan", 88)]
+    reporte = reporte_estudiantes(estudiantes_notas)
+    print(f"Notas originales: {estudiantes_notas}")
+    print(f"Reporte de letras: {reporte}\n")
+
+    print(" Punto 8: Carrito de compras ")
+    agregar_producto("Camiseta", 25.0, 2)
+    agregar_producto("Pantalón", 40.0, 1)
+    print("Carrito actual:", carrito)
+    print("Total sin descuento:", total_carrito())
+    print("Total con 10% descuento:", aplicar_descuento(10), "\n")
+
+    print("Punto 9: Agrupar productos por categoría ")
+    productos = [("Manzana", "Frutas"), ("Leche", "Lácteos"), ("Pera", "Frutas"), ("Queso", "Lácteos"), ("Zanahoria", "Verduras")]
+    grupos = agrupar_por_categoria(productos)
+    print(f"Lista de productos: {productos}")
+    print(f"Agrupación: {grupos}\n")
+
+    print("Punto 10: Procesamiento de votos")
+    candidatos = {"Ana", "Luis", "Marta", "Juan"}
+    votos = ["Ana", "Luis", "Ana", "Marta", "Pedro", "Ana", "Juan", "Luis", "Ana", "Maria"]
+    resultado = procesar_votos(votos, candidatos)
+    print(f"Candidatos válidos: {candidatos}")
+    print(f"Votos: {votos}")
+    if resultado:
+        print(f"Conteo: {resultado['conteo']}")
+        print(f"Votos inválidos: {resultado['votos_invalidos']}")
+        print(f"Ganador: {resultado['ganador']} con {resultado['porcentaje_ganador']:.2f}% de los votos válidos")
+    else:
+        print("No hubo votos válidos")
